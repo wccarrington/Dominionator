@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import random, math
+import sys, random, math, time
 
 class Cards:
     pass
@@ -78,7 +78,7 @@ class Deck:
         self.index = 0
 
 class Hand:
-    def __init__(self, deck, idx):
+    def __init__(self, deck, idx=None):
         self.hand = []
 
         self.deck = deck
@@ -197,32 +197,56 @@ def stats(numbers):
     return mean, dev
 
 def summarize(results):
-    print "Money:   mean %6.3f, stddev %6.3f" % stats([r.money   for r in results])
-    print "Buys:    mean %6.3f, stddev %6.3f" % stats([r.buys    for r in results])
-    print "Actions: mean %6.3f, stddev %6.3f" % stats([r.actions for r in results])
-    print "Used:    mean %6.3f, stddev %6.3f" % stats([r.used    for r in results])
+    out = [
+        "Trials: %i" % len(results),
+        "Money:   mean %6.3f, stddev %6.3f" % stats([r.money   for r in results]),
+        "Buys:    mean %6.3f, stddev %6.3f" % stats([r.buys    for r in results]),
+        "Actions: mean %6.3f, stddev %6.3f" % stats([r.actions for r in results]),
+        "Used:    mean %6.3f, stddev %6.3f" % stats([r.used    for r in results]),
+    ]
+    print '\n'.join(out)
+
+def continuous(deck, delay = 0.15):
+    last = time.time()
+    results = []
+    sys.stdout.write("[2J[H")
+    sys.stdout.flush()
+    try:
+        while True:
+            results.append(Hand(deck).play())
+            now = time.time()
+            if now - last > delay:
+                last = now
+                sys.stdout.write("[H")
+                summarize(results)
+    except KeyboardInterrupt: pass
 
 def main():
     import optparse
     p = optparse.OptionParser()
     p.add_option('-n', '--num', type='int')
     p.add_option('-s', '--summary', action='store_true')
+    p.add_option('-c', '--continuous', action='store_true')
     p.set_defaults(num=1, summary=False)
 
     opts, specs = p.parse_args()
 
     deck = Deck(specs)
-    if not opts.summary:
-        print Result.HEADER
-    results = []
-    for i in xrange(opts.num):
-        result = Hand(deck, i).play()
+
+    if opts.continuous:
+        continuous(deck)
+    else:
+        if not opts.summary:
+            print Result.HEADER
+        results = []
+        for i in xrange(opts.num):
+            result = Hand(deck, i).play()
+            if opts.summary:
+                results.append(result)
+            else:
+                print result.oneline()
         if opts.summary:
-            results.append(result)
-        else:
-            print result.oneline()
-    if opts.summary:
-        summarize(results)
+            summarize(results)
 
 if __name__ == '__main__':
     main()
