@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import random
+import random, math
 
 class Cards:
     pass
@@ -78,12 +78,14 @@ class Deck:
         self.index = 0
 
 class Hand:
-    def __init__(self, deck, n=5):
+    def __init__(self, deck, idx):
         self.hand = []
 
         self.deck = deck
         self.deck.shuffle()
-        self.draw(n)
+        self.draw(5)
+
+        self.idx = idx
 
         self.money = 0
         self.actions = 1
@@ -176,6 +178,7 @@ class Hand:
 
 class Result:
     def __init__(self, hand):
+        self.idx = hand.idx
         self.money = hand.money
         self.buys = hand.buys
         self.actions = hand.actions
@@ -184,12 +187,42 @@ class Result:
     def __str__(self):
         return "Result money %2i, buys %i, actions %i, used %2d/%2d (%6.2f%%)" % (
             self.money, self.buys, self.actions, self.used, self.decksize, 100.*self.used/self.decksize)
+    def oneline(self):
+        return "%i\t%i\t%i\t%i\t%i" % (self.idx, self.money, self.buys, self.actions, self.used)
+    HEADER = "\tmoney\tbuys\tactions\tused"
 
-def main(specs):
+def stats(numbers):
+    mean = float(sum(numbers))/len(numbers)
+    dev = math.sqrt(sum([(mean-x)**2 for x in numbers])/len(numbers))
+    return mean, dev
+
+def summarize(results):
+    print "Money:   mean %6.3f, stddev %6.3f" % stats([r.money   for r in results])
+    print "Buys:    mean %6.3f, stddev %6.3f" % stats([r.buys    for r in results])
+    print "Actions: mean %6.3f, stddev %6.3f" % stats([r.actions for r in results])
+    print "Used:    mean %6.3f, stddev %6.3f" % stats([r.used    for r in results])
+
+def main():
+    import optparse
+    p = optparse.OptionParser()
+    p.add_option('-n', '--num', type='int')
+    p.add_option('-s', '--summary', action='store_true')
+    p.set_defaults(num=1, summary=False)
+
+    opts, specs = p.parse_args()
+
     deck = Deck(specs)
-    for i in xrange(20):
-        print Hand(deck).play()
+    if not opts.summary:
+        print Result.HEADER
+    results = []
+    for i in xrange(opts.num):
+        result = Hand(deck, i).play()
+        if opts.summary:
+            results.append(result)
+        else:
+            print result.oneline()
+    if opts.summary:
+        summarize(results)
 
 if __name__ == '__main__':
-    import sys
-    main(sys.argv[1:])
+    main()
