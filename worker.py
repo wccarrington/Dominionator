@@ -16,7 +16,7 @@ for m in Modifs.MODIFS:
     decks[m].applyModif(m)
 
 start = time.time()
-delay = 0.5
+delay = 0.1
 try:
     while True:
         resultbatch.base.accumulate(Dominion.Hand(deck).play())

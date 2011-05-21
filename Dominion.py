@@ -235,12 +235,28 @@ class ResultHist:
         mapadd(self.used,    resulthist.used)
 
     def summary(self):
-        return "money %6.2f buys %6.2f actions %6.2f used %6.2f (%i trials)" % (
+        return Summary(self.n,
             mapavg(self.money),
             mapavg(self.buys),
             mapavg(self.actions),
-            mapavg(self.used),
-            self.n)
+            mapavg(self.used))
+
+class Summary:
+    def __init__(self, n, money, buys, actions, used):
+        self.n = n
+        self.money = money
+        self.buys = buys
+        self.actions = actions
+        self.used = used
+    def __str__(self):
+        return "money %+6.2f buys %+6.2f actions %+6.2f used %+6.2f (%i trials)" % (
+            self.money, self.buys, self.actions, self.used, self.n)
+    def sub(self, other):
+        return Summary(self.n,
+            self.money - other.money,
+            self.buys - other.buys,
+            self.actions - other.actions,
+            self.used - other.used)
 
 class ResultBatch:
     def __init__(self, modifs):

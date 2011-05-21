@@ -19,9 +19,14 @@ try:
         resultbatch.add(Interop.recv(p.stdout))
 
         sys.stdout.write("[H[2J")
-        print "%-22s: %s" % ("base:", resultbatch.base.summary())
-        for m,hist in sorted(resultbatch.modif.items()):
-            print "%-22s: %s" % (m, hist.summary())
+        basesum = resultbatch.base.summary()
+        print "%-22s: %s" % ("base:", basesum)
+        sums = {}
+        for m,hist in resultbatch.modif.items():
+            sums[m] = hist.summary().sub(basesum)
+        for m in sorted(sums.keys(), key=lambda m: sums[m].money+sums[m].buys, reverse=False):
+            print "%-22s: %s" % (m, sums[m])
+
 except KeyboardInterrupt:
     pass
 
