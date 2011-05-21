@@ -186,3 +186,19 @@ class Result:
     def __str__(self):
         return "Result money %2i, buys %i, actions %i, used %2d/%2d (%6.2f%%)" % (
             self.money, self.buys, self.actions, self.used, self.decksize, 100.*self.used/self.decksize)
+
+class ResultBatch:
+    def __init__(self):
+        self.n = 0
+        self.money = {}
+        self.buys = {}
+        self.actions = {}
+        self.used = {}
+
+    def accumulate(self, result):
+        def mapinc(d, k):
+            d[k] = d.get(k,0)+1
+        mapinc(self.money, result.money)
+        mapinc(self.buys, result.buys)
+        mapinc(self.actions, result.actions)
+        mapinc(self.used, result.used)
