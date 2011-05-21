@@ -36,6 +36,8 @@ Card("Moat",        2, draws=2)
 Card("Chancellor",  3, money=2)
 Card("Village",     3, actions=2, draws=1)
 Card("Woodcutter",  3, buys=1, money=2)
+Card("Workshop",    3, money=4, buys=1) # effectively
+Card("Bureaucrat",  4, money=3, buys=1) # effectively
 Card("Feast",       4, money=5) # effectively
 Card("Militia",     4, money=2)
 Card("Moneylender", 4) # special: money = 3 if copper in hand, 0 otherwise
@@ -207,6 +209,9 @@ def mapadd(d1, d2):
     for k,v in d2.items():
         mapinc(d1, k, v)
 
+def mapavg(d):
+    return float(sum([k*v for k,v in d.items()])) / sum(d.values())
+
 class ResultHist:
     def __init__(self):
         self.n = 0
@@ -229,13 +234,22 @@ class ResultHist:
         mapadd(self.actions, resulthist.actions)
         mapadd(self.used,    resulthist.used)
 
+    def summary(self):
+        return "money %6.2f buys %6.2f actions %6.2f used %6.2f (%i trials)" % (
+            mapavg(self.money),
+            mapavg(self.buys),
+            mapavg(self.actions),
+            mapavg(self.used),
+            self.n)
+
 class ResultBatch:
     def __init__(self, modifs):
         self.base = ResultHist()
         self.modif = dict([(m,ResultHist()) for m in modifs])
 
     def add(self, resultbatch):
-        for m,hist in resultbatch.items():
+        self.base.add(resultbatch.base)
+        for m,hist in resultbatch.modif.items():
             self.modif[m].add(hist)
 
     def reset(self):

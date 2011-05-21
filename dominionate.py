@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
 import sys, subprocess
+import Dominion
 import Interop
+import Modifs
 
 specs = sys.argv[1:]
 
@@ -10,9 +12,18 @@ p = subprocess.Popen(
     stdin = subprocess.PIPE,
     stdout = subprocess.PIPE)
 
-while True:
-    resultbatch = Interop.recv(p.stdout)
-    print resultbatch.base.n
+resultbatch = Dominion.ResultBatch(Modifs.MODIFS)
+
+try:
+    while True:
+        resultbatch.add(Interop.recv(p.stdout))
+
+        sys.stdout.write("[H[2J")
+        print "%-12s: %s" % ("base:", resultbatch.base.summary())
+        for m,hist in sorted(resultbatch.modif.items()):
+            print "%-12s: %s" % (m, hist.summary())
+except KeyboardInterrupt:
+    pass
 
 p.send_signal(2)
 
