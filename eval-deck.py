@@ -157,13 +157,12 @@ class Hand:
         if card is Cards.Library:
             self.draw(7-len(self.hand))
 
-        if card is Cards.Mine:
-            if Cards.Copper in self.hand:
-                self.hand.remove(Cards.Copper)
-                self.hand.append(Cards.Silver)
-            elif Cards.Silver in self.hand:
-                self.hand.remove(Cards.Silver)
-                self.hand.append(Cards.Gold)
+        if card is Cards.Mine and Cards.Copper in self.hand:
+            self.hand.remove(Cards.Copper)
+            self.hand.append(Cards.Silver)
+        elif card is Cards.Mine and Cards.Silver in self.hand:
+            self.hand.remove(Cards.Silver)
+            self.hand.append(Cards.Gold)
 
         if card is Cards.Cellar:
             points = filter(lambda c: c.ispoints, self.hand)
