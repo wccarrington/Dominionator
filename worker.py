@@ -17,12 +17,18 @@ for m in Modifs.MODIFS:
 
 start = time.time()
 delay = 0.5
-while True:
-    resultbatch.base.accumulate(Dominion.Hand(deck).play())
-    for m in Modifs.MODIFS:
-        resultbatch.modif[m].accumulate(Dominion.Hand(decks[m]).play())
-    now = time.time()
-    if now - start > delay:
-        start = now
-        Interop.send(sys.stdout, resultbatch)
-        resultbatch.reset()
+try:
+    while True:
+        resultbatch.base.accumulate(Dominion.Hand(deck).play())
+        for m in Modifs.MODIFS:
+            resultbatch.modif[m].accumulate(Dominion.Hand(decks[m]).play())
+        now = time.time()
+        if now - start > delay:
+            start = now
+            Interop.send(sys.stdout, resultbatch)
+            resultbatch.reset()
+except IOError, e:
+    if e.errno != 32:
+        raise e
+except KeyboardInterrupt:
+    pass
