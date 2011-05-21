@@ -19,9 +19,9 @@ try:
         resultbatch.add(Interop.recv(p.stdout))
 
         sys.stdout.write("[H[2J")
-        print "%-12s: %s" % ("base:", resultbatch.base.summary())
+        print "%-22s: %s" % ("base:", resultbatch.base.summary())
         for m,hist in sorted(resultbatch.modif.items()):
-            print "%-12s: %s" % (m, hist.summary())
+            print "%-22s: %s" % (m, hist.summary())
 except KeyboardInterrupt:
     pass
 

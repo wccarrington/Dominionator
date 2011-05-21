@@ -73,9 +73,9 @@ class Deck:
 
     def applyModif(self, modif):
         if modif[0] == '+':
-            cardname = modif[1:]
-            assert hasattr(Cards, cardname), cardname
-            self.cards.append(getattr(Cards, cardname))
+            for cardname in modif[1:].split(','):
+                assert hasattr(Cards, cardname), cardname
+                self.cards.append(getattr(Cards, cardname))
         else:
             assert False, "bad modif: "+modif
 
