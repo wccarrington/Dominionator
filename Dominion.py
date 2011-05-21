@@ -54,7 +54,7 @@ Card("Witch",       5, draws=2)
 Card("Adventurer",  6) # special, draw until you have get two treasure draws
 
 class Deck:
-    def __init__(self, specs):
+    def __init__(self, specs=[]):
         self.cards = []
         for spec in specs:
             cardname,number = spec.split('=')
@@ -63,6 +63,19 @@ class Deck:
             for i in xrange(int(number)):
                 self.cards.append(getattr(Cards, cardname))
         self.shuffle()
+
+    def clone(self):
+        d = Deck()
+        d.cards = self.cards[:]
+        return d
+
+    def applyModif(self, modif):
+        if modif[0] == '+':
+            cardname = modif[1:]
+            assert hasattr(Cards, cardname), cardname
+            self.cards.append(getattr(Cards, cardname))
+        else:
+            assert False, "bad modif: "+modif
 
     def candraw(self):
         return self.index < len(self.cards)
@@ -187,7 +200,14 @@ class Result:
         return "Result money %2i, buys %i, actions %i, used %2d/%2d (%6.2f%%)" % (
             self.money, self.buys, self.actions, self.used, self.decksize, 100.*self.used/self.decksize)
 
-class ResultBatch:
+def mapinc(d, k, v=1):
+    d[k] = d.get(k,0)+v
+
+def mapadd(d1, d2):
+    for k,v in d2.items():
+        mapinc(d1, k, v)
+
+class ResultHist:
     def __init__(self):
         self.n = 0
         self.money = {}
@@ -196,9 +216,29 @@ class ResultBatch:
         self.used = {}
 
     def accumulate(self, result):
-        def mapinc(d, k):
-            d[k] = d.get(k,0)+1
-        mapinc(self.money, result.money)
-        mapinc(self.buys, result.buys)
+        self.n += 1
+        mapinc(self.money,   result.money)
+        mapinc(self.buys,    result.buys)
         mapinc(self.actions, result.actions)
-        mapinc(self.used, result.used)
+        mapinc(self.used,    result.used)
+
+    def add(self, resulthist):
+        self.n += resulthist.n
+        mapadd(self.money,   resulthist.money)
+        mapadd(self.buys,    resulthist.buys)
+        mapadd(self.actions, resulthist.actions)
+        mapadd(self.used,    resulthist.used)
+
+class ResultBatch:
+    def __init__(self, modifs):
+        self.base = ResultHist()
+        self.modif = dict([(m,ResultHist()) for m in modifs])
+
+    def add(self, resultbatch):
+        for m,hist in resultbatch.items():
+            self.modif[m].add(hist)
+
+    def reset(self):
+        self.base = ResultHist()
+        for m in self.modif.keys():
+            self.modif[m] = ResultHist()
