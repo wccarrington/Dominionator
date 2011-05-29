@@ -37,7 +37,8 @@ try:
             window.move(n+1, 0)
             window.addstr("%-22s: %s" % (m, sums[m]))
         window.refresh()
-
+except KeyboardInterrupt:
+    pass
 finally:
     curses.endwin()
 
