@@ -7,7 +7,7 @@ import Modifs
 import curses
 from collections import defaultdict
 
-cards = sys.argv[1:]
+cards = sorted(sys.argv[1:])
 
 deck = defaultdict(lambda: 0, {'Copper': 7, 'Estate':3})
 
@@ -34,13 +34,19 @@ start_workers(deck, cards)
 resultbatch = Dominion.ResultBatch(Modifs.MODIFS)
 
 def showdeck(deck):
-    specs = [str(k) + '=' + str(v) for k,v in deck.items()]
+    specs = sorted([str(k) + '=' + str(v) for k,v in deck.items()])
     maxlength = max(len(x) for x in specs)+4
     for n, s in enumerate(sorted(specs)):
         window.addstr(n, cols-maxlength, s)
 
 def addToDeck(deck, card):
-    deck[card] = deck[card] + 1    
+    deck[card] = deck[card] + 1
+
+def removeFromDeck(deck, card):
+    if deck[card] > 0:
+        deck[card] = deck[card] - 1
+    if deck[card] == 0:
+        del deck[card]
 
 running = True
 
@@ -63,6 +69,8 @@ try:
                 running = False
             elif c == ord('a'):
                 inputstate = 'add'
+            elif c == ord('r'):
+                inputstate = 'remove'
         elif inputstate == 'add':
             if c in numbers:
                 n = numbers.index(c)
@@ -88,6 +96,31 @@ try:
                 inputstate = 'main'
             if c == ord('c'):
                 inputstate = 'main'
+        elif inputstate == 'remove':
+            if c in numbers:
+                n = numbers.index(c)
+                removeFromDeck(deck, cards[n])
+                inputstate = 'main'
+            if c == ord('w'):
+                removeFromDeck(deck, 'Copper')
+                inputstate = 'main'
+            if c == ord('e'):
+                removeFromDeck(deck, 'Silver')
+                inputstate = 'main'
+            if c == ord('r'):
+                removeFromDeck(deck, 'Gold')
+                inputstate = 'main'
+            if c == ord('s'):
+                removeFromDeck(deck, 'Estate')
+                inputstate = 'main'
+            if c == ord('d'):
+                removeFromDeck(deck, 'Duchy')
+                inputstate = 'main'
+            if c == ord('f'):
+                removeFromDeck(deck, 'Province')
+                inputstate = 'main'
+            if c == ord('c'):
+                inputstate = 'main'
         window.erase()
         window.move(0,0)
         if inputstate == 'main':
@@ -98,10 +131,21 @@ try:
                 sums[m] = hist.summary().sub(basesum)
             for n, m in enumerate(sorted(sums.keys(), key=lambda m: sums[m].money+sums[m].buys, reverse=False)[-rows+2:]):
                 window.addstr(n+1, 0, "%-22s: %s" % (m, sums[m]))
-            window.addstr(rows-1, 0, "[A]dd Card  [Q]uit", curses.A_REVERSE)
+            window.addstr(rows-1, 0, "[A]dd Card  [R]emove Card  [Q]uit", curses.A_REVERSE)
             showdeck(deck)
         elif inputstate == 'add':
             window.addstr(0,0, "Add a card")
+            for n, card in enumerate(cards):
+                window.addstr(n+1, 0, "%i: %s" % ((n+1) % 10, card))
+            base = len(cards)
+            window.addstr(base+2, 0, "W: Copper")
+            window.addstr(base+3, 0, "E: Silver")
+            window.addstr(base+4, 0, "R: Gold")
+            window.addstr(base+6, 0, "S: Estate")
+            window.addstr(base+7, 0, "D: Duchy")
+            window.addstr(base+8, 0, "F: Province")
+            window.addstr(base+10, 0, "C: Cancel")
+        elif inputstate == 'remove':
             for n, card in enumerate(cards):
                 window.addstr(n+1, 0, "%i: %s" % ((n+1) % 10, card))
             base = len(cards)
