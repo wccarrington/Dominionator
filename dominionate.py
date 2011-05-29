@@ -20,6 +20,11 @@ workers = [subprocess.Popen(
 
 resultbatch = Dominion.ResultBatch(Modifs.MODIFS)
 
+def showdeck(specs):
+    maxlength = max(len(x) for x in specs)+4
+    for n, s in enumerate(sorted(specs)):
+        window.addstr(n, cols-maxlength, s)
+
 try:
     while True:
         for w in workers:
@@ -32,9 +37,10 @@ try:
         sums = {}
         for m,hist in resultbatch.modif.items():
             sums[m] = hist.summary().sub(basesum)
-        for n, m in enumerate(sorted(sums.keys(), key=lambda m: sums[m].money+sums[m].buys, reverse=False)[-rows+1:]):
-            window.move(n+1, 0)
-            window.addstr("%-22s: %s" % (m, sums[m]))
+        for n, m in enumerate(sorted(sums.keys(), key=lambda m: sums[m].money+sums[m].buys, reverse=False)[-rows+2:]):
+            window.addstr(n+1, 0, "%-22s: %s" % (m, sums[m]))
+        window.addstr(rows-1, 0, "[A]dd Card", curses.A_REVERSE)
+        showdeck(specs)
         window.refresh()
 except KeyboardInterrupt:
     pass
