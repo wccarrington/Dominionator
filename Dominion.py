@@ -23,37 +23,67 @@ class Card:
     def __str__(self): return self.name
     def __repr__(self): return self.name
 
+#Static Cards
 Card("Copper",      0, money=1, ismoney=True)
 Card("Silver",      3, money=2, ismoney=True)
 Card("Gold",        6, money=3, ismoney=True)
-Card("Estate",      2, ispoints=True)
-Card("Duchy",       5, ispoints=True)
-Card("Province",    8, ispoints=True)
-Card("Garden",      4, ispoints=True)
-Card("Cellar",      2, actions=1) # special; you should hang on to points to drop them here
-Card("Chapel",      2)
-Card("Moat",        2, draws=2)
+Card("Estate",      2, ispoints=True) # 1 point
+Card("Duchy",       5, ispoints=True) # 3 points
+Card("Province",    8, ispoints=True) # 6 points
+
+#Dominion
+Card("Adventurer",  6) # reveal and discard non-treasure until you have get two treasures, put the treasure in hand
+Card("Bureaucrat",  4, money=3, buys=1) # effectively, gain a silver, put on top of deck. other players reveal victory card from hand and put on deck, or a victory card-less hand
+Card("Cellar",      2, actions=1) # discard n cards to draw n cards
 Card("Chancellor",  3, money=2)
-Card("Village",     3, actions=2, draws=1)
-Card("Woodcutter",  3, buys=1, money=2)
-Card("Workshop",    3, money=4, buys=1) # effectively
-Card("Bureaucrat",  4, money=3, buys=1) # effectively
-Card("Feast",       4, money=5) # effectively
+Card("Chapel",      2) # discard 4
+Card("CouncilRoom", 5, draws=4, buys=1)
+Card("Feast",       4, money=5) # trash to gain a card up to cost 5
+Card("Festival",    5, actions=2, buys=1, money=2)
+Card("Garden",      4, ispoints=True) # 1 point per 10 cards
+Card("Laboratory",  5, draws=2, actions=1)
+Card("Library",     5) # draw to 7 card in hand
+Card("Market",      5, draws=1, actions=1, buys=1, money=1)
 Card("Militia",     4, money=2)
-Card("Moneylender", 4) # special: money = 3 if copper in hand, 0 otherwise
-Card("Remodel",     4, money=2) # effectively
+Card("Mine",        5) # replace one copper with silver, or one silver with gold, stays in hand
+Card("Moat",        2, draws=2)
+Card("Moneylender", 4) # trash a copper for +3 money
+Card("Remodel",     4) # trash a card, gain a card costing up to 2 more
 Card("Smithy",      4, draws=3)
 Card("Spy",         4, draws=1, actions=1)
 Card("Thief",       4)
-Card("ThroneRoom",  4) # special, weird
-Card("CouncilRoom", 5, draws=4, buys=1)
-Card("Festival",    5, actions=2, buys=1, money=2)
-Card("Laboratory",  5, draws=2, actions=1)
-Card("Library",     5) # special: draws = 7-handsize
-Card("Market",      5, draws=1, actions=1, buys=1, money=1)
-Card("Mine",        5) # special: if have any copper or silver, money=2
+Card("ThroneRoom",  4) # choose an action card, it takes effect twice
+Card("Village",     3, actions=2, draws=1)
 Card("Witch",       5, draws=2)
-Card("Adventurer",  6) # special, draw until you have get two treasure draws
+Card("Woodcutter",  3, buys=1, money=2)
+Card("Workshop",    3) # gain a card up to cost 4
+
+#Intrigue
+Card("Baron",         4, buys=1) #discard and estate for +4 money, otherwise gain an estate
+Card("Bridge",        4, buys=1, money=1) #everything is one cheaper
+Card("Consiprator",   4, money=2) #if you've played 3 or more actions(including this one): +1 card, +1 action
+Card("Coppersmith",   4) # 1 money per copper this turn
+Card("Courtyard",     2, draws=3) #special: put one card on deck
+Card("Duke",          5) #worth 1 point per duchy
+Card("GreatHall",     3, draws=1, actions=1, ispoints=True) #1 point
+Card("Harem",         6, money=2, ismoney=True, ispoints=True) # 2 points
+Card("Ironworks",     4, money=4, buys=1) #effectively, if you get an actions-> +1 action, treasure-> +1 money, victory -> +1 card
+Card("Masquerade",    3, draws=2) #all players pass a card to left, then may trash one
+Card("MiningVillage", 4, draws=1, actions=2) #may trash for +2 money
+Card("Minion",        5, actions=1) #+2 money or (discard your hand and +4 cards, and every other player with 5 or more card discards them and draws 4)
+Card("Nobles",        6, ispoints=True) #+3 cards or +2 actions, 2 points
+Card("Pawn",          2, draws=1, actions=1, buys=1, money=1) #pick 2
+Card("Saboteur",      5) #each player reveals cards until one costs 3 or more, trash, and get a card costing at most 2 less
+Card("Scout",         4, actions=1) #reveal top 4 cards of deck, all victory points go into hand, others go onto deck in any order
+Card("SecretChamber", 2) #discard any number of cards, +1 per card discarded. when attacked, +2 card, then may put 2 cards from your hand on your deck
+Card("Shanty Town",   3, actions=2) #reveal hand, +2 cards if no actions in it
+Card("Steward",       3, draws=2, money=2) #trash 2, choose one
+Card("Swindler",      3, money=2) #each other player trashes the top card of his deck, and gains a card with the same cost you choose
+Card("Torturer",      5, draws=3) #everyone chooses one: discard 2 cards, or gain a curse
+Card("TradingPost",  5) #Trash 2 cards, gain a silver in your hand
+Card("Tribute",       5) #Player to your left reveals top 2 cards of deck, for each: action-> +2 actions, treasuer-> +2 money, victory-> +2 cards
+Card("Upgrade",       5, draws=1, actions=1) #Trash a card, gain a card costing exactly 1 more
+Card("WishingWell",   3, draws=1, actions=1) #name a card, reveal top of deck, if is named, put in hand
 
 class Deck:
     def __init__(self, specs=[]):
