@@ -39,6 +39,9 @@ def showdeck(deck):
     for n, s in enumerate(sorted(specs)):
         window.addstr(n, cols-maxlength, s)
 
+def addToDeck(deck, card):
+    deck[card] = deck[card] + 1    
+
 running = True
 
 inputstate = 'main'
@@ -63,25 +66,25 @@ try:
         elif inputstate == 'add':
             if c in numbers:
                 n = numbers.index(c)
-                deck[cards[n]] = deck[cards[n]] + 1
+                addToDeck(deck, cards[n])
                 inputstate = 'main'
             if c == ord('w'):
-                deck['Copper'] = deck['Copper'] + 1
+                addToDeck(deck, 'Copper')
                 inputstate = 'main'
             if c == ord('e'):
-                deck['Silver'] = deck['Silver'] + 1
+                addToDeck(deck, 'Silver')
                 inputstate = 'main'
             if c == ord('r'):
-                deck['Gold'] = deck['Gold'] + 1
+                addToDeck(deck, 'Gold')
                 inputstate = 'main'
             if c == ord('s'):
-                deck['Estate'] = deck['Estate'] + 1
+                addToDeck(deck, 'Estate')
                 inputstate = 'main'
             if c == ord('d'):
-                deck['Duchy'] = deck['Duchy'] + 1
+                addToDeck(deck, 'Duchy')
                 inputstate = 'main'
             if c == ord('f'):
-                deck['Province'] = deck['Province'] + 1
+                addToDeck(deck, 'Province')
                 inputstate = 'main'
             if c == ord('c'):
                 inputstate = 'main'
@@ -101,13 +104,14 @@ try:
             window.addstr(0,0, "Add a card")
             for n, card in enumerate(cards):
                 window.addstr(n+1, 0, "%i: %s" % ((n+1) % 10, card))
-            window.addstr(12, 0, "W: Copper")
-            window.addstr(13, 0, "E: Silver")
-            window.addstr(14, 0, "R: Gold")
-            window.addstr(16, 0, "S: Estate")
-            window.addstr(17, 0, "D: Duchy")
-            window.addstr(18, 0, "F: Province")
-            window.addstr(20, 0, "C: Cancel")
+            base = len(cards)
+            window.addstr(base+2, 0, "W: Copper")
+            window.addstr(base+3, 0, "E: Silver")
+            window.addstr(base+4, 0, "R: Gold")
+            window.addstr(base+6, 0, "S: Estate")
+            window.addstr(base+7, 0, "D: Duchy")
+            window.addstr(base+8, 0, "F: Province")
+            window.addstr(base+10, 0, "C: Cancel")
         window.refresh()
 except KeyboardInterrupt:
     pass
