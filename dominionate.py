@@ -8,7 +8,7 @@ import Modifs
 specs = sys.argv[1:]
 
 p = subprocess.Popen(
-    ["worker.py"]+specs,
+    ["./worker.py"]+specs,
     stdin = subprocess.PIPE,
     stdout = subprocess.PIPE)
 
