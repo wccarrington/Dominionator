@@ -5,7 +5,6 @@ import Dominion
 import Interop
 import Modifs
 import curses
-import os
 
 window = curses.initscr()
 rows, cols = window.getmaxyx()
@@ -29,7 +28,7 @@ try:
         window.erase()
         window.move(0,0)
         basesum = resultbatch.base.summary()
-        window.addstr("%-22s: %s" % ("base:", basesum))
+        window.addstr("%-22s: %s" % ("base:", basesum), curses.A_REVERSE)
         sums = {}
         for m,hist in resultbatch.modif.items():
             sums[m] = hist.summary().sub(basesum)
