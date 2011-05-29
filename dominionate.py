@@ -26,7 +26,6 @@ try:
         for w in workers:
             resultbatch.add(Interop.recv(w.stdout))
 
-#        sys.stdout.write("[H[2J")
         window.erase()
         window.move(0,0)
         basesum = resultbatch.base.summary()
@@ -34,8 +33,8 @@ try:
         sums = {}
         for m,hist in resultbatch.modif.items():
             sums[m] = hist.summary().sub(basesum)
-        for n, m in enumerate(sorted(sums.keys(), key=lambda m: sums[m].money+sums[m].buys, reverse=False)[-rows:]):
-            window.move(n, 0)
+        for n, m in enumerate(sorted(sums.keys(), key=lambda m: sums[m].money+sums[m].buys, reverse=False)[-rows+1:]):
+            window.move(n+1, 0)
             window.addstr("%-22s: %s" % (m, sums[m]))
         window.refresh()
 
