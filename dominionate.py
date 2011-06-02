@@ -29,6 +29,13 @@ def start_workers(deck, cards):
         stdin = subprocess.PIPE,
         stdout = subprocess.PIPE) for x in xrange(subprocesses)]
 
+def stop_workers():
+    global workers
+    for w in workers:
+        w.send_signal(2)
+        w.wait()
+    workers = []
+
 start_workers(deck, cards)
 
 resultbatch = Dominion.ResultBatch(Modifs.MODIFS)
@@ -54,6 +61,9 @@ inputstate = 'main'
 
 numbers = [ord(str(x)) for x in [1,2,3,4,5,6,7,8,9,0]]
 
+cardchoices = dict(zip(numbers, cards) + [(ord('w'), 'Copper'), (ord('e'), 'Silver'), (ord('r'), 'Gold'),
+                                          (ord('s'), 'Estate'), (ord('d'), 'Duchy'), (ord('f'), 'Province')])
+
 try:
     window = curses.initscr()
     rows, cols = window.getmaxyx()
@@ -72,52 +82,14 @@ try:
             elif c == ord('r'):
                 inputstate = 'remove'
         elif inputstate == 'add':
-            if c in numbers:
-                n = numbers.index(c)
-                addToDeck(deck, cards[n])
-                inputstate = 'main'
-            if c == ord('w'):
-                addToDeck(deck, 'Copper')
-                inputstate = 'main'
-            if c == ord('e'):
-                addToDeck(deck, 'Silver')
-                inputstate = 'main'
-            if c == ord('r'):
-                addToDeck(deck, 'Gold')
-                inputstate = 'main'
-            if c == ord('s'):
-                addToDeck(deck, 'Estate')
-                inputstate = 'main'
-            if c == ord('d'):
-                addToDeck(deck, 'Duchy')
-                inputstate = 'main'
-            if c == ord('f'):
-                addToDeck(deck, 'Province')
+            if c in cardchoices:
+                addToDeck(deck, cardchoices[c])
                 inputstate = 'main'
             if c == ord('c'):
                 inputstate = 'main'
         elif inputstate == 'remove':
-            if c in numbers:
-                n = numbers.index(c)
-                removeFromDeck(deck, cards[n])
-                inputstate = 'main'
-            if c == ord('w'):
-                removeFromDeck(deck, 'Copper')
-                inputstate = 'main'
-            if c == ord('e'):
-                removeFromDeck(deck, 'Silver')
-                inputstate = 'main'
-            if c == ord('r'):
-                removeFromDeck(deck, 'Gold')
-                inputstate = 'main'
-            if c == ord('s'):
-                removeFromDeck(deck, 'Estate')
-                inputstate = 'main'
-            if c == ord('d'):
-                removeFromDeck(deck, 'Duchy')
-                inputstate = 'main'
-            if c == ord('f'):
-                removeFromDeck(deck, 'Province')
+            if c in cardchoices:
+                removeFromDeck(deck, cardchoices[c])
                 inputstate = 'main'
             if c == ord('c'):
                 inputstate = 'main'
@@ -162,6 +134,4 @@ except KeyboardInterrupt:
 finally:
     curses.endwin()
 
-    for w in workers:
-        w.send_signal(2)
-        print w.wait()
+    stop_workers()
