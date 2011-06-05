@@ -3,7 +3,6 @@
 import sys, subprocess
 import Dominion
 import Interop
-import Modifs
 import curses
 from collections import defaultdict
 
@@ -38,7 +37,7 @@ def stop_workers():
 
 start_workers(deck, cards)
 
-resultbatch = Dominion.ResultBatch(Modifs.MODIFS)
+resultbatch = Dominion.ResultBatch()
 
 def showdeck(deck):
     specs = sorted([str(k) + '=' + str(v) for k,v in deck.items()])
@@ -97,7 +96,8 @@ try:
         window.move(0,0)
         if inputstate == 'main':
             basesum = resultbatch.base.summary()
-            window.addstr("%-22s: %s" % ("base:", basesum), curses.A_REVERSE)
+            window.addstr(0, 0, "%-22s: %s" % ("base:", basesum), curses.A_REVERSE)
+            window.addstr(1, 0, str(resultbatch.base.purchaseset))
             sums = {}
             for m,hist in resultbatch.modif.items():
                 sums[m] = hist.summary().sub(basesum)

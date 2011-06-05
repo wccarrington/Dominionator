@@ -2,26 +2,23 @@
 
 import sys, time
 import Dominion
-import Modifs
 import Interop
 
 specs = sys.argv[1:]
 
 deck = Dominion.Deck(specs)
 
-resultbatch = Dominion.ResultBatch(Modifs.MODIFS)
+resultbatch = Dominion.ResultBatch()
 decks = {}
-for m in Modifs.MODIFS:
-    decks[m] = deck.clone()
-    decks[m].applyModif(m)
+modifs = []
 
 start = time.time()
 delay = 0.1
 try:
     while True:
         resultbatch.base.accumulate(Dominion.Hand(deck).play())
-        for m in Modifs.MODIFS:
-            resultbatch.modif[m].accumulate(Dominion.Hand(decks[m]).play())
+        for m in modifs:
+            resultbatch.accumulate(m, Dominion.Hand(decks[m]).play())
         now = time.time()
         if now - start > delay:
             start = now

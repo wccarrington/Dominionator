@@ -249,6 +249,7 @@ class ResultHist:
         self.buys = {}
         self.actions = {}
         self.used = {}
+        self.purchaseset = set()
 
     def accumulate(self, result):
         self.n += 1
@@ -256,6 +257,7 @@ class ResultHist:
         mapinc(self.buys,    result.buys)
         mapinc(self.actions, result.actions)
         mapinc(self.used,    result.used)
+        self.purchaseset.add((result.money, result.buys))
 
     def add(self, resulthist):
         self.n += resulthist.n
@@ -263,6 +265,7 @@ class ResultHist:
         mapadd(self.buys,    resulthist.buys)
         mapadd(self.actions, resulthist.actions)
         mapadd(self.used,    resulthist.used)
+        self.purchaseset = self.purchaseset | resulthist.purchaseset
 
     def summary(self):
         return Summary(self.n,
@@ -289,16 +292,24 @@ class Summary:
             self.used - other.used)
 
 class ResultBatch:
-    def __init__(self, modifs):
-        self.base = ResultHist()
-        self.modif = dict([(m,ResultHist()) for m in modifs])
+    def __init__(self):
+        self.reset()
 
     def add(self, resultbatch):
         self.base.add(resultbatch.base)
         for m,hist in resultbatch.modif.items():
-            self.modif[m].add(hist)
+            self.addhist(m, hist)
+
+    def addhist(self, m, hist):
+        if m not in self.modif:
+            self.modif[m] = ResultHist()
+        self.modif[m].add(hist)
+
+    def accumulate(self, m, result):
+        if m not in self.modif:
+            self.modif[m] = ResultHist()
+        self.modif[m].accumulate(result)
 
     def reset(self):
         self.base = ResultHist()
-        for m in self.modif.keys():
-            self.modif[m] = ResultHist()
+        self.modif = dict()
