@@ -97,7 +97,7 @@ try:
         if inputstate == 'main':
             basesum = resultbatch.base.summary()
             window.addstr(0, 0, "%-22s: %s" % ("base:", basesum), curses.A_REVERSE)
-            window.addstr(1, 0, str(resultbatch.base.purchaseset))
+            window.addstr(1, 0, str(Dominion.possibleModifs(resultbatch.base.purchaseSet, cardchoices.values())))
             sums = {}
             for m,hist in resultbatch.modif.items():
                 sums[m] = hist.summary().sub(basesum)

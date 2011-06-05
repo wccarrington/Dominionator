@@ -249,7 +249,7 @@ class ResultHist:
         self.buys = {}
         self.actions = {}
         self.used = {}
-        self.purchaseset = set()
+        self.purchaseSet = set()
 
     def accumulate(self, result):
         self.n += 1
@@ -257,7 +257,7 @@ class ResultHist:
         mapinc(self.buys,    result.buys)
         mapinc(self.actions, result.actions)
         mapinc(self.used,    result.used)
-        self.purchaseset.add((result.money, result.buys))
+        self.purchaseSet.add((result.money, result.buys))
 
     def add(self, resulthist):
         self.n += resulthist.n
@@ -265,7 +265,7 @@ class ResultHist:
         mapadd(self.buys,    resulthist.buys)
         mapadd(self.actions, resulthist.actions)
         mapadd(self.used,    resulthist.used)
-        self.purchaseset = self.purchaseset | resulthist.purchaseset
+        self.purchaseSet |= resulthist.purchaseSet
 
     def summary(self):
         return Summary(self.n,
@@ -313,3 +313,32 @@ class ResultBatch:
     def reset(self):
         self.base = ResultHist()
         self.modif = dict()
+
+def getAllCombinations(cards, maxnum):
+    if maxnum == 1:
+        return [(c,) for c in cards]
+    subcomb = getAllCombinations(cards, maxnum-1)
+    ret = []
+    for c in cards:
+        for comb in subcomb:
+            ret += (c) + comb
+    return ret
+
+def combinationCost(comb):
+    return sum(getattr(Cards, c).cost for c in comb)
+
+def possibleModifs(purchaseSet, cards):
+    ret = set()
+    moneyPerBuy = {}
+    for money, buys in purchaseSet:
+        if money > moneyPerBuy.get(buys, -1):
+            moneyPerBuy[buys] = money
+    allCombinations = getAllCombinations(cards, max(moneyPerBuy.keys()))
+    for buys, money in moneyPerBuy.items():
+        for comb in allCombinations:
+            if len(comb) > buys:
+                continue
+            if combinationCost(comb) <= money:
+                ret.add(comb)
+    return ret
+            
