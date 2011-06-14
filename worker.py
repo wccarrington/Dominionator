@@ -23,6 +23,13 @@ try:
         if now - start > delay:
             start = now
             Interop.send(sys.stdout, resultbatch)
+            modifs = Interop.recv(sys.stdin)
+            for m in modifs:
+                if m not in decks:
+                    d = deck.clone()
+                    for mod in m:
+                        d.applyModif('+' + mod)
+                    decks[m] = d
             resultbatch.reset()
 except IOError, e:
     if e.errno != 32:

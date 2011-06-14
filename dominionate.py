@@ -63,6 +63,8 @@ numbers = [ord(str(x)) for x in [1,2,3,4,5,6,7,8,9,0]]
 cardchoices = dict(zip(numbers, cards) + [(ord('w'), 'Copper'), (ord('e'), 'Silver'), (ord('r'), 'Gold'),
                                           (ord('s'), 'Estate'), (ord('d'), 'Duchy'), (ord('f'), 'Province')])
 
+modifs = []
+
 try:
     window = curses.initscr()
     rows, cols = window.getmaxyx()
@@ -71,8 +73,10 @@ try:
     while running:
         for w in workers:
             resultbatch.add(Interop.recv(w.stdout))
+            Interop.send(w.stdin, modifs)
 
         c = window.getch()
+        c = 0
         if inputstate == 'main':
             if c == ord('q'):
                 running = False
@@ -97,7 +101,6 @@ try:
         if inputstate == 'main':
             basesum = resultbatch.base.summary()
             window.addstr(0, 0, "%-22s: %s" % ("base:", basesum), curses.A_REVERSE)
-            window.addstr(1, 0, str(Dominion.possibleModifs(resultbatch.base.purchaseSet, cardchoices.values())))
             sums = {}
             for m,hist in resultbatch.modif.items():
                 sums[m] = hist.summary().sub(basesum)
@@ -129,6 +132,7 @@ try:
             window.addstr(base+8, 0, "F: Province")
             window.addstr(base+10, 0, "C: Cancel")
         window.refresh()
+        modifs = Dominion.possibleModifs(resultbatch.base.purchaseSet, cardchoices.values())
 except KeyboardInterrupt:
     pass
 finally:

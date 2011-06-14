@@ -10,6 +10,8 @@ def send(output, value):
 
 def recv(input):
     n_s = input.read(4)
+    if len(n_s) == 0:
+        raise KeyboardInterrupt()
     n = struct.unpack('>i', n_s)[0]
     data_s = input.read(n)
     data = cPickle.loads(data_s)
