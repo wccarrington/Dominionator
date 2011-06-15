@@ -76,7 +76,6 @@ try:
             Interop.send(w.stdin, modifs)
 
         c = window.getch()
-        c = 0
         if inputstate == 'main':
             if c == ord('q'):
                 running = False
