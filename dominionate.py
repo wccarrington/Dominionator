@@ -18,7 +18,7 @@ subprocesses = 2
 
 workers = []
 
-def start_workers(deck, cards):
+def start_workers(deck):
     global workers
     specs = []
     for k,v in deck.items():
@@ -35,7 +35,7 @@ def stop_workers():
         w.wait()
     workers = []
 
-start_workers(deck, cards)
+start_workers(deck)
 
 resultbatch = Dominion.ResultBatch()
 
@@ -86,6 +86,9 @@ try:
         elif inputstate == 'add':
             if c in cardchoices:
                 addToDeck(deck, cardchoices[c])
+                stop_workers()
+                start_workers(deck)
+                resultbatch = Dominion.ResultBatch()
                 inputstate = 'main'
             if c == ord('c'):
                 inputstate = 'main'

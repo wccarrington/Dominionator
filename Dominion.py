@@ -38,7 +38,7 @@ Card("Cellar",      2, actions=1) # discard n cards to draw n cards
 Card("Chancellor",  3, money=2)
 Card("Chapel",      2) # discard 4
 Card("CouncilRoom", 5, draws=4, buys=1)
-Card("Feast",       4, money=5) # trash to gain a card up to cost 5
+Card("Feast",       4) # trash to gain a card up to cost 5
 Card("Festival",    5, actions=2, buys=1, money=2)
 Card("Garden",      4, ispoints=True) # 1 point per 10 cards
 Card("Laboratory",  5, draws=2, actions=1)
@@ -240,6 +240,8 @@ def mapadd(d1, d2):
         mapinc(d1, k, v)
 
 def mapavg(d):
+    if sum(d.values()) == 0:
+        return 0
     return float(sum([k*v for k,v in d.items()])) / sum(d.values())
 
 class ResultHist:
@@ -316,12 +318,12 @@ class ResultBatch:
 
 def getAllCombinations(cards, maxnum):
     if maxnum == 1:
-        return [(c,) for c in cards]
+        return set((c,) for c in cards)
     subcomb = getAllCombinations(cards, maxnum-1)
-    ret = []
+    ret = set(subcomb)
     for c in cards:
         for comb in subcomb:
-            ret += (c) + comb
+            ret.add(tuple(sorted((c,) + comb)))
     return ret
 
 def combinationCost(comb):
@@ -333,12 +335,12 @@ def possibleModifs(purchaseSet, cards):
     for money, buys in purchaseSet:
         if money > moneyPerBuy.get(buys, -1):
             moneyPerBuy[buys] = money
+    if len(moneyPerBuy.keys()) == 0:
+        return ret
     allCombinations = getAllCombinations(cards, max(moneyPerBuy.keys()))
     for buys, money in moneyPerBuy.items():
         for comb in allCombinations:
-            if len(comb) > buys:
-                continue
-            if combinationCost(comb) <= money:
+            if len(comb) <= buys and combinationCost(comb) <= money:
                 ret.add(comb)
     return ret
             
